@@ -29,6 +29,7 @@ public final class CreateUserService implements CreateUserUseCase {
   private final GetUserByEmailPort getUserByEmailPort;
   private final EmailNotificationService emailNotificationService;
   private final Validator validator;
+  private final UserApplicationMapper userApplicationMapper;
 
   @Override
   public UserModel execute(final CreateUserCommand command) {
@@ -43,9 +44,6 @@ public final class CreateUserService implements CreateUserUseCase {
     // verificar si el email ya existe en la base de datos
     ensureEmailDoesNotExist(command.email());
 
-    // Clean Code - Regla 3: aquí se mezcla lógica de negocio de alto nivel (crear usuario)
-    // con detalles de construcción de bajo nivel (new UserId, new UserName, etc.).
-    // Estos detalles deberían estar equivocados en el mapper o en una fábrica.
     final UserModel userToSave = buildUserModel(command);
 
     // Clean Code - Regla 10: comentario que explica lo obvio — no aporta valor.
@@ -75,12 +73,6 @@ public final class CreateUserService implements CreateUserUseCase {
   }
 
   private UserModel buildUserModel(final CreateUserCommand command) {
-    return new UserModel(
-        new UserId(command.id()),
-        new UserName(command.name()),
-        new UserEmail(command.email()),
-        UserPassword.fromPlainText(command.password()),
-        UserRole.fromString(command.role()),
-        UserStatus.PENDING);
+    return userApplicationMapper.toModel(command);
   }
 }
