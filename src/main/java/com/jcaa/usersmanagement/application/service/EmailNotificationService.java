@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.logging.Level;
 
 @Log
 @RequiredArgsConstructor
@@ -32,7 +31,7 @@ public final class EmailNotificationService {
 
   public void notifyUserCreated(final UserModel user, final String plainPassword) {
     // Clean Code - Regla 25 (claridad sobre ingenio) y Regla 26 (evitar sobrecompactación):
-    // Se comprime toda la operación en una cadena de llamadas anidadas en una sola expresión.
+    // Se comprime toda la operation en una cadena de llamadas anidadas en una sola expresión.
     // Aunque "funciona", sacrifica completamente la legibilidad.
     // Clean Code - Regla 11 (evitar duplicación): la construcción de tokens del mapa
     // es idéntica a la de notifyUserUpdated — debería centralizarse.
@@ -48,12 +47,12 @@ public final class EmailNotificationService {
     final String htmlBody = renderTemplate(template, tokens);
     final EmailDestinationModel destination = buildDestination(user, SUBJECT_CREATED, htmlBody);
     
-    sendOrLog(destination);
+    sendEmail(destination);
   }
 
   public void notifyUserUpdated(final UserModel user) {
     // Clean Code - Regla 11 (evitar duplicación): misma estructura que notifyUserCreated —
-    // loadTemplate → renderTemplate → buildDestination → sendOrLog.
+    // loadTemplate → renderTemplate → buildDestination → sendEmail.
     // Esta lógica de orquestación debería extraerse a un método genérico privado.
     // Clean Code - Regla 25 y 26: misma sobrecompactación que arriba.
     final String template = loadTemplate("user-updated.html");
@@ -68,7 +67,7 @@ public final class EmailNotificationService {
     final String htmlBody = renderTemplate(template, tokens);
     final EmailDestinationModel destination = buildDestination(user, SUBJECT_UPDATED, htmlBody);
     
-    sendOrLog(destination);
+    sendEmail(destination);
   }
 
   private static EmailDestinationModel buildDestination(
@@ -103,23 +102,7 @@ public final class EmailNotificationService {
     return result;
   }
 
-  // Clean Code - Regla 7 (evitar efectos secundarios ocultos):
-  // El nombre "sendOrLog" promete dos cosas (enviar o loguear), pero ninguna de las
-  // dos describe el comportamiento real completo: en el flujo exitoso NO loguea nada,
-  // y en el fallido loguea Y re-lanza la excepción.
-  // Los llamadores (notifyUserCreated, notifyUserUpdated) creen que solo "envían un correo",
-  // pero en realidad también producen un log de advertencia de forma inesperada.
-  // La regla dice: una función no debe realizar acciones inesperadas además de lo que
-  // su nombre promete.
-  private void sendOrLog(final EmailDestinationModel destination) {
-    try {
-      emailSenderPort.send(destination);
-    } catch (final EmailSenderException senderException) {
-      log.log(
-          Level.WARNING,
-          "[EmailNotificationService] No se pudo enviar correo a: {0}. Causa: {1}",
-          new Object[] {destination.getDestinationEmail(), senderException.getMessage()});
-      throw senderException;
-    }
+  private void sendEmail(final EmailDestinationModel destination) {
+    emailSenderPort.send(destination);
   }
 }
