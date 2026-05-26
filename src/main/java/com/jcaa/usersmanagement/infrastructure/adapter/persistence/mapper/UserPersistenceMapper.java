@@ -9,23 +9,22 @@ import com.jcaa.usersmanagement.domain.valueobject.UserName;
 import com.jcaa.usersmanagement.domain.valueobject.UserPassword;
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.dto.UserPersistenceDto;
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.entity.UserEntity;
+import lombok.experimental.UtilityClass;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-// VIOLACIÓN Regla 4: clase con solo métodos de conversión que NO está anotada con @UtilityClass.
-// Sin @UtilityClass, Lombok no genera constructor privado y la clase puede instanciarse.
-// Además los métodos deberían ser static al no usar estado de instancia.
 // Clean Code - Regla 13 (evitar clases utilitarias innecesarias):
 // Esta clase existe porque NO se usa MapStruct (regla 7 de Reglas 1.md: usar MapStruct como
 // única librería de mapeo). Al escribir mappers manualmente se crea una clase "utilitaria"
 // cuya lógica debería estar generada automáticamente, no dispersa en código manual.
 // Una clase UserPersistenceMapper escrita a mano es señal de lógica mal ubicada.
+@UtilityClass
 public class UserPersistenceMapper {
 
-  public UserPersistenceDto fromModelToDto(final UserModel user) {
+  public static UserPersistenceDto fromModelToDto(final UserModel user) {
     // Clean Code - Regla 14 (Ley de Deméter):
     // Cada línea encadena dos llamadas: user → getValue object → .value().
     // Por ejemplo: user.getId().value() navega al interior del value object UserId
@@ -43,7 +42,7 @@ public class UserPersistenceMapper {
         null);
   }
 
-  public UserEntity fromResultSetToEntity(final ResultSet resultSet) throws SQLException {
+  public static UserEntity fromResultSetToEntity(final ResultSet resultSet) throws SQLException {
     return new UserEntity(
         resultSet.getString("id"),
         resultSet.getString("name"),
@@ -55,7 +54,7 @@ public class UserPersistenceMapper {
         resultSet.getString("updated_at"));
   }
 
-  public UserModel fromEntityToModel(final UserEntity entity) {
+  public static UserModel fromEntityToModel(final UserEntity entity) {
     return new UserModel(
         new UserId(entity.id()),
         new UserName(entity.name()),
@@ -65,11 +64,11 @@ public class UserPersistenceMapper {
         UserStatus.fromString(entity.status()));
   }
 
-  public UserModel fromResultSetToModel(final ResultSet resultSet) throws SQLException {
+  public static UserModel fromResultSetToModel(final ResultSet resultSet) throws SQLException {
     return fromEntityToModel(fromResultSetToEntity(resultSet));
   }
 
-  public List<UserModel> fromResultSetToModelList(final ResultSet resultSet) throws SQLException {
+  public static List<UserModel> fromResultSetToModelList(final ResultSet resultSet) throws SQLException {
     final List<UserModel> users = new ArrayList<>();
     while (resultSet.next()) {
       users.add(fromResultSetToModel(resultSet));
