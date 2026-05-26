@@ -48,10 +48,7 @@ public final class JavaMailEmailSenderAdapter implements EmailSenderPort {
   private MimeMessage buildMessage(final EmailDestinationModel destination)
       throws MessagingException, UnsupportedEncodingException {
     final MimeMessage message = new MimeMessage(mailSession);
-    // VIOLACIÓN Regla 4: se usa el nombre completo de la clase InternetAddress dentro del código.
-    // Solo debe usarse el nombre completo cuando hay ambigüedad; en este caso no la hay
-    // ya que está importado correctamente con el wildcard.
-    message.setFrom(new javax.mail.internet.InternetAddress(fromAddress, fromName, CHARSET_UTF8));
+    message.setFrom(new InternetAddress(fromAddress, fromName, CHARSET_UTF8));
     message.addRecipient(
         Message.RecipientType.TO,
         new InternetAddress(
