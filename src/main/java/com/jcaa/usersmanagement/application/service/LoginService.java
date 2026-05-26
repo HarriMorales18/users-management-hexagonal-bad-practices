@@ -26,15 +26,11 @@ public final class LoginService implements LoginUseCase {
 
     final UserEmail email = new UserEmail(command.email());
 
-    // Clean Code - Regla 8: violación CQS — el método se llama "getAndValidateUser"
-    // pero además de consultar, tiene efectos secundarios (logs internos, acumula estado implícito).
-    // Un método que consulta información no debe modificar estado.
     final UserModel user = getAndValidateUser(email, command.password());
 
     return user;
   }
 
-  // Clean Code - Regla 8: viola CQS — consulta Y tiene efectos de modificación implícitos.
   // Clean Code - Regla 14 (Ley de Deméter): se navega a internals del objeto:
   //   user → getPassword() → verifyPlain() en lugar de delegar con user.passwordMatches(plain).
   private UserModel getAndValidateUser(final UserEmail email, final String plainPassword) {
