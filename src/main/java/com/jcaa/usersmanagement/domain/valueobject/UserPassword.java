@@ -20,8 +20,7 @@ public final class UserPassword {
    * crea o cambia su contraseña.
    */
   public static UserPassword fromPlainText(final String plainText) {
-    // VIOLACIÓN Regla 4: se usa == null en lugar de Objects.isNull() o Objects.requireNonNull()
-    if (plainText == null) {
+    if (Objects.isNull(plainText)) {
       throw new NullPointerException("Password cannot be null");
     }
     final String normalizedValue = plainText.trim();
