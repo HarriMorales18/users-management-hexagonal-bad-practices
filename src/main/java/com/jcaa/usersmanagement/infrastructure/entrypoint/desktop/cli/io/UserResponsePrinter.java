@@ -25,9 +25,6 @@ public final class UserResponsePrinter {
   }
 
   public void printList(final List<UserResponse> users) {
-    // VIOLACIÓN Regla 5: si GetAllUsersService retorna null (lista vacía → null),
-    // esta llamada a users.isEmpty() lanza NullPointerException en tiempo de ejecución.
-    // Ningún método debe retornar null — se deben usar colecciones vacías.
     if (users.isEmpty()) {
       console.println("  No users found.");
       return;
