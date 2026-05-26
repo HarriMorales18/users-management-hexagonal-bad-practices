@@ -17,26 +17,24 @@ public final class UpdateUserHandler implements OperationHandler {
 
   @Override
   public void handle() {
-    // VIOLACIÓN Regla 4: abreviaturas en nombres de variables ("pw" y "upd").
-    // Los nombres deben ser claros y descriptivos, sin abreviaturas.
     final String id   = console.readRequired("User ID                                       : ");
     final String name = console.readRequired("New name                                      : ");
     final String email= console.readRequired("New email                                     : ");
-    final String pw   = console.readOptional("New password (leave blank to keep current)    : ");
+    final String password = console.readOptional("New password (leave blank to keep current)    : ");
     final String role = console.readRequired("Role   (ADMIN / MEMBER / REVIEWER)            : ");
     final String status=console.readRequired("Status (ACTIVE / INACTIVE / PENDING / BLOCKED): ");
 
     try {
-      final UserResponse upd = userController.updateUser(
+      final UserResponse updatedUser = userController.updateUser(
           new UpdateUserRequest(
               id,
               name,
               email,
-              pw.isBlank() ? null : pw,
+              password.isBlank() ? null : password,
               role,
               status));
       console.println("\n  User updated successfully.");
-      printer.print(upd);
+      printer.print(updatedUser);
     } catch (final UserNotFoundException exception) {
       console.println("  Not found: " + exception.getMessage());
     }
