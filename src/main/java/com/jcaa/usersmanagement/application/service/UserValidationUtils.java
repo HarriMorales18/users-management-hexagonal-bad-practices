@@ -12,9 +12,9 @@ import com.jcaa.usersmanagement.domain.enums.UserRole;
  * La regla dice: no crear clases Utils/Helper/Manager sin una razón sólida.
  * La lógica de negocio vive en los objetos de negocio, no en utilitarios genéricos.
  * Una clase llamada "UserValidationUtils" es señal de:
- *   - diseño pobre
- *   - lógica mal ubicada
- *   - falta de encapsulación en dominio o servicios
+ * - diseño pobre
+ * - lógica mal ubicada
+ * - falta de encapsulación en dominio o servicios
  *
  * Clean Code - Regla 23 (minimizar conocimiento disperso):
  * Las reglas de validación de usuario están fragmentadas aquí en vez de estar
@@ -22,11 +22,11 @@ import com.jcaa.usersmanagement.domain.enums.UserRole;
  *
  * Clean Code - Regla 12 (alta cohesión real):
  * Esta clase mezcla responsabilidades que no pertenecen al mismo concepto:
- *   - Validación de estado (isUserActive)
- *   - Validación de rol (isAdmin)
- *   - Validación de formato de email (isValidEmail)
- *   - Validación de contraseña (isValidPassword)
- *   - Verificación de permisos con parámetros mixtos (canPerformAction)
+ * - Validación de estado (isUserActive)
+ * - Validación de rol (isAdmin)
+ * - Validación de formato de email (isValidEmail)
+ * - Validación de contraseña (isValidPassword)
+ * - Verificación de permisos con parámetros mixtos (canPerformAction)
  * Sus métodos no trabajan sobre un mismo concepto o responsabilidad — son un
  * "contenedor de cosas relacionadas vagamente". Eso es exactamente baja cohesión.
  */
@@ -62,27 +62,21 @@ public class UserValidationUtils {
     return password != null && password.length() >= 8;
   }
 
+  public record AccessPolicyRequest(String userId, String email, String status, int maxInactivityDays) {}
+
   // Clean Code - Regla 20 (objeto antes que primitivo cuando el concepto lo merezca):
   // Este método recibe userId, email y status como String y int desnudos en lugar de
   // usar los tipos de dominio UserId, UserEmail y UserStatus.
   // El código pierde toda la protección de invariantes que ofrecen los value objects:
   // un id vacío, un email malformado o un status inválido pasarían desapercibidos.
   // La regla dice: encapsula conceptos como UserId, Email, Status con sus propios tipos.
-  // Clean Code - Regla 5 (pocos parámetros): además recibe maxInactivityDays como
-  // primitivo int suelto, que podría encapsularse en un objeto de política de acceso.
-  public static boolean canPerformAction(
-      final String userId,
-      final String email,
-      final String status,
-      final int maxInactivityDays) {
+  public static boolean canPerformAction(final AccessPolicyRequest request) {
     // Clean Code - Regla 17: condición larga y difícil de leer que debería extraerse.
-    if (userId == null || userId.isBlank() || email == null || !email.contains("@")) {
+    if (request.userId() == null || request.userId().isBlank() || request.email() == null || !request.email().contains("@")) {
       return false;
     }
     // Clean Code - Regla 18: "ACTIVE" y "PENDING" son literales mágicos —
     // deberían ser UserStatus.ACTIVE.name() o constantes con nombre descriptivo.
-    return ("ACTIVE".equals(status) || "PENDING".equals(status)) && maxInactivityDays >= 0;
+    return ("ACTIVE".equals(request.status()) || "PENDING".equals(request.status())) && request.maxInactivityDays() >= 0;
   }
 }
-
-
