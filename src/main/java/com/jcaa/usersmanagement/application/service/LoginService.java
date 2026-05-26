@@ -35,24 +35,31 @@ public final class LoginService implements LoginUseCase {
   }
 
   // Clean Code - Regla 8: viola CQS — consulta Y tiene efectos de modificación implícitos.
-  // Clean Code - Regla 1: hace demasiadas cosas: busca usuario, verifica contraseña y valida estado.
-  // Clean Code - Regla 2 (funciones cortas): este método creció hasta convertirse en una mini-clase.
-  //   Hace fetch → null-check → password-verify → status-check → return; son 4 responsabilidades.
-  //   Si exige demasiado análisis para entenderse, debe dividirse.
   // Clean Code - Regla 14 (Ley de Deméter): se navega a internals del objeto:
   //   user → getPassword() → verifyPlain() en lugar de delegar con user.passwordMatches(plain).
   private UserModel getAndValidateUser(final UserEmail email, final String plainPassword) {
-    final UserModel user = getUserByEmailPort.getByEmail(email).orElse(null);
+    final UserModel user = fetchUser(email);
+    verifyPassword(user, plainPassword);
+    verifyUserStatus(user);
+    return user;
+  }
 
+  private UserModel fetchUser(final UserEmail email) {
+    final UserModel user = getUserByEmailPort.getByEmail(email).orElse(null);
     if (user == null) {
       throw InvalidCredentialsException.becauseCredentialsAreInvalid();
     }
+    return user;
+  }
 
+  private void verifyPassword(final UserModel user, final String plainPassword) {
     // Clean Code - Regla 14: acceso profundo a internals del value object.
     if (!user.getPassword().verifyPlain(plainPassword)) {
       throw InvalidCredentialsException.becauseCredentialsAreInvalid();
     }
+  }
 
+  private void verifyUserStatus(final UserModel user) {
     // Clean Code - Regla 12 (alta cohesión): lógica de dominio sobre estados válidos
     // dispersa en la capa de aplicación — debería encapsularse en UserModel o un servicio de dominio.
     // Clean Code - Regla 17: condición booleana compleja y difícil de leer.
@@ -66,8 +73,6 @@ public final class LoginService implements LoginUseCase {
         || user.getStatus() == UserStatus.PENDING) {
       throw InvalidCredentialsException.becauseUserIsNotActive();
     }
-
-    return user;
   }
 
   private void validateCommand(final LoginCommand command) {
