@@ -17,9 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Clean Code - Regla 13 (evitar clases utilitarias innecesarias):
-// Esta clase existe porque NO se usa MapStruct (regla 7 de Reglas 1.md: usar MapStruct como
-// única librería de mapeo). Al escribir mappers manualmente se crea una clase "utilitaria"
-// cuya lógica debería estar generada automáticamente, no dispersa en código manual.
+// Esta clase existe porque NO se usa MapStruct. Al escribir mappers manualmente se crea una clase 
+// "utilitaria" cuya lógica debería estar generada automáticamente, no dispersa en código manual.
 // Una clase UserPersistenceMapper escrita a mano es señal de lógica mal ubicada.
 @UtilityClass
 public class UserPersistenceMapper {
