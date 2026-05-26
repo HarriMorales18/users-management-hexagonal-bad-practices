@@ -55,8 +55,6 @@ public final class UpdateUserService implements UpdateUserUseCase {
     return updatedUser;
   }
 
-  // Clean Code - Regla 7: efecto secundario oculto — el nombre "notifyIfRequired" no indica
-  // que también hace logging cuando notify=false. El nombre es engañoso sobre sus efectos.
   private void notifyUser(final UserModel user) {
     emailNotificationService.notifyUserUpdated(user);
   }
