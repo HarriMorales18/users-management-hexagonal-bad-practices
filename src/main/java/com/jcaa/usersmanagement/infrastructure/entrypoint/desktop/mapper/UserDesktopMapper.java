@@ -10,17 +10,12 @@ import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.dto.CreateUser
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.dto.LoginRequest;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.dto.UpdateUserRequest;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.dto.UserResponse;
+import lombok.experimental.UtilityClass;
 
 import java.util.List;
 
-public final class UserDesktopMapper {
-
-  private UserDesktopMapper() {
-    // clase utilitaria: no se permite instanciar
-  }
-
-  // Regla 4 (Clean Code): los métodos públicos van primero; el auxiliar privado
-  // aparece al final, cerca del método público que lo invoca.
+@UtilityClass
+public class UserDesktopMapper {
 
   public static CreateUserCommand toCreateCommand(final CreateUserRequest request) {
     return new CreateUserCommand(
